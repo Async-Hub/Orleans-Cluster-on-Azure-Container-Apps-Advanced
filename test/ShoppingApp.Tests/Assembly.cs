@@ -1,0 +1,1 @@
+﻿//[assembly: Xunit.TestFramework("Initialization.ClusterFixture", "ShoppingApp.Tests")]

@@ -1,0 +1,7 @@
+@page "/shop"
+@using ShoppingApp.WebUI.Products
+@inherits ShoppingApp.WebUI.Extensions.PageWithApplicationInsights
+
+<PurchasableProductTable Title="Shop Inventory"
+    Products=@_products IsInCart=@IsProductAlreadyInCart
+    OnAddedToCart=@OnAddedToCart />

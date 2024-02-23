@@ -1,0 +1,320 @@
+# https://aka.ms/yaml
+variables:
+  # Staging 'sa1, sa2 sa3, ...'
+  # s - staging a - advanced => sa
+  nameSuffix: 'sa1'
+  appNamePrefix: 'shoppingapp1'
+
+trigger:
+- main
+
+stages:
+- stage: Build
+  displayName: Build stage
+  pool:
+    name: Default
+    demands:
+        - dotnet
+  variables:
+    buildPlatform: 'Any CPU'
+    buildConfiguration: 'Release'
+  jobs:
+    - job: Build_Solution
+      displayName: Whole solution build process
+      steps:
+      - task: DotNetCoreCLI@2
+        displayName: 'Build solution ShoppingApp.sln'
+        inputs:
+          command: build
+          projects: 'ShoppingApp.sln'
+          configuration: '$(buildConfiguration)'
+
+      # Run Tests
+      - task: DotNetCoreCLI@2
+        displayName: 'Run Integration Tests'
+        inputs:
+          command: test
+          projects: |
+            test/ShoppingApp.Tests
+            test/ShoppingApp.Tests.FSharp
+          publishTestResults: true
+
+##################### Packing Infrastructure Artifacts Stage #####################
+
+- stage: Packing_Infrastructure_Artifacts
+  displayName: Packing infrastructure artifacts stage
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  pool:
+    name: Default
+    demands:
+        - dotnet
+  variables:
+    buildPlatform: 'Any CPU'
+    buildConfiguration: 'Release'
+  jobs:
+  - job: Publish_Infrastructure_Artifacts
+    displayName: Publish infrastructure artifacts
+    steps:
+    - task: CopyFiles@2
+      displayName: 'Copy whole infrastructure deployment file'
+      inputs:
+        sourceFolder: '$(Build.SourcesDirectory)/deploy/azure-container-apps'
+        contents: '**/*.bicep'
+        targetFolder: '$(Build.ArtifactStagingDirectory)/infrastructure/deploy'
+        cleanTargetFolder: true
+        
+    # https://docs.microsoft.com/en-us/azure/devops/pipelines/artifacts/pipeline-artifacts
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish whole infrastructure deployment file to Pipeline Artifacts'
+      inputs:
+        targetPath: '$(Build.ArtifactStagingDirectory)/infrastructure/deploy'
+        artifactName: 'infrastructure'
+
+##################### Provision Azure Container Registry Stage #####################
+
+- stage: Provision_Azure_Container_Registry
+  displayName: Provision azure container registry stage
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  pool:
+    name: Default
+    demands:
+      - AZURE_CLI -equals True
+  variables:
+    azureServiceConnection: 'DefaultAzureServiceConnection'
+    resourceGroupName: 'rg-shopping-app-main'
+    location: 'eastus'
+    templateFile: '$(Pipeline.Workspace)/infrastructure/azure-container-registry.bicep'
+  jobs:
+  - job: Deploy_Azure_Container_Registry
+    displayName: Deploy azure container registry
+    steps:
+    - task: DownloadPipelineArtifact@2
+      displayName: 'Download whole infrastructure deployment files'
+      name: t1
+      inputs:
+        artifact: 'infrastructure'
+        path: $(Pipeline.Workspace)/infrastructure
+
+    - task: AzureCLI@2
+      displayName: 'Deploy azure container registry'
+      name: t2
+      inputs:
+        azureSubscription: 'DefaultAzureServiceConnection'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          az --version
+          az group create --name $(resourceGroupName) --location $(location)
+          ACR_CREDENTIALS=$(az deployment group create --resource-group $(resourceGroupName) \
+             --template-file $(templateFile) --parameters appNamePrefix='$(appNamePrefix)' --query properties.outputs)
+          # Retrieve the output values from the deployment
+          ACR_NAME=$(jq --raw-output '.acrName.value' <<< $ACR_CREDENTIALS)
+          ACR_URL=$(jq --raw-output '.acrUrl.value' <<< $ACR_CREDENTIALS)
+          echo "Setting ACR_CREDENTIALS for output"
+          echo "##vso[task.setvariable variable=acrName;isOutput=true]$ACR_NAME"
+          echo "##vso[task.setvariable variable=acrUrl;isOutput=true]$ACR_URL"
+          echo "##vso[task.setvariable variable=acrResourceGroupName;isOutput=true]$(resourceGroupName)"
+          echo "ACR credentials is: $acrName $ACR_URL"
+          env | sort
+
+##################### Publishing Solution Artifacts Stage #####################
+
+- stage: Publishing_Solution_Artifacts_Stage
+  displayName: Publishing solution artifacts stage
+  dependsOn: Provision_Azure_Container_Registry
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  pool:
+    name: Default
+    demands:
+      - docker
+  variables:
+    acrUrl: $[ stageDependencies.Provision_Azure_Container_Registry.Deploy_Azure_Container_Registry.outputs['t2.acrUrl'] ]
+    acrName: $[ stageDependencies.Provision_Azure_Container_Registry.Deploy_Azure_Container_Registry.outputs['t2.acrName'] ]
+  jobs:
+  - job: Push_Containers_Images
+    displayName: Push container images
+    steps:
+    # Version with GitVersion
+    - task: gitversion/setup@0
+      displayName: Install GitVersion
+      inputs:
+        versionSpec: '5.x'
+
+    - task: gitversion/execute@0
+      displayName: Execute GitVersion
+
+    # Print SemVer Number
+    - script: echo $(GitVersion.SemVer)
+      displayName: 'Print SemVer Number'
+
+    - task: AzureCLI@2
+      displayName: 'Push ShoppingApp.SiloHost container image'
+      inputs:
+        azureSubscription: 'DefaultAzureServiceConnection'
+        addSpnToEnvironment: true
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          echo "ACR credentials is: $(acrUrl) $(acrName) $(acrResourceGroupName)"
+          az --version
+          az acr login --name $(acrUrl)
+          cd "$(Build.SourcesDirectory)"
+          docker build -t "$(acrUrl)/shoppingapp/silohost:$(GitVersion.SemVer)" -f src/ShoppingApp.SiloHost/Dockerfile . \
+            --build-arg assemblyInformationalVersion=$(GitVersion.InformationalVersion)
+          docker push "$(acrUrl)/shoppingapp/silohost:$(GitVersion.SemVer)"
+
+    - task: AzureCLI@2
+      displayName: 'Push ShoppingApp.WebUI container image'
+      inputs:
+        azureSubscription: 'DefaultAzureServiceConnection'
+        addSpnToEnvironment: true
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          az acr login --name $(acrUrl)
+          cd "$(Build.SourcesDirectory)"
+          docker build -t "$(acrUrl)/shoppingapp/webui:$(GitVersion.SemVer)" -f src/ShoppingApp.WebUI/Dockerfile . \
+            --build-arg assemblyInformationalVersion=$(GitVersion.InformationalVersion)
+          docker push "$(acrUrl)/shoppingapp/webui:$(GitVersion.SemVer)"
+
+##################### Provision Infrastructure Stages #####################
+
+- stage: Provision_Staging_Infrastructure
+  displayName: Provision staging infrastructure stage
+  dependsOn:
+  - Provision_Azure_Container_Registry
+  - Publishing_Solution_Artifacts_Stage
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  variables:
+      azureServiceConnection: 'DefaultAzureServiceConnection'
+      resourceGroupName: 'rg-$(appNamePrefix)'
+      location: 'eastus'
+      templateFile: '$(Pipeline.Workspace)/infrastructure/solution-infrastructure.bicep'
+      acrUrl: $[ stageDependencies.Provision_Azure_Container_Registry.Deploy_Azure_Container_Registry.outputs['t2.acrUrl'] ]
+      acrName: $[ stageDependencies.Provision_Azure_Container_Registry.Deploy_Azure_Container_Registry.outputs['t2.acrName'] ]
+      acrResourceGroupName: $[ stageDependencies.Provision_Azure_Container_Registry.Deploy_Azure_Container_Registry.outputs['t2.acrResourceGroupName'] ]
+  jobs:
+  - deployment: Deploy_Infrastructure_Staging
+    displayName: Deploy staging infrastructure in Azure
+    pool:
+      name: Default
+      demands:
+        - AZURE_CLI -equals True
+    environment: 'Staging'
+    strategy: 
+      runOnce:
+        deploy:
+          steps:
+          - task: DownloadPipelineArtifact@2
+            displayName: 'Download whole infrastructure deployment file'
+            inputs:
+              artifact: 'infrastructure'
+              path: $(Pipeline.Workspace)/infrastructure
+          
+          # Version with GitVersion
+          - task: gitversion/setup@0
+            displayName: Install GitVersion
+            inputs:
+              versionSpec: '5.x'
+
+          - task: gitversion/execute@0
+            displayName: Execute GitVersion
+
+          - task: AzureCLI@2
+            displayName: 'Deploy the whole infrastructure to Azure'
+            name: t1
+            inputs:
+              azureSubscription: 'DefaultAzureServiceConnection'
+              addSpnToEnvironment: true
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                az --version
+                az group create --name $(resourceGroupName)-$(nameSuffix) --location $(location)
+                DEPLOYMENT_OUTPUT=$(az deployment group create --resource-group $(resourceGroupName)-$(nameSuffix) \
+                  --template-file $(templateFile) --parameters nameSuffix='$(nameSuffix)' \
+                  appNamePrefix='$(appNamePrefix)' semVer='$(GitVersion.SemVer)' sqlAdministratorPassword='Passw@rd1+' \
+                  acrName='$(acrName)' acrUrl='$(acrUrl)' acrResourceGroupName='$(acrResourceGroupName)' \
+                  executorSecurityPrincipal=${servicePrincipalId} --query properties.outputs)
+                WEBUI_CA_URL=$(jq --raw-output '.webUiCaUrl.value' <<< $DEPLOYMENT_OUTPUT)
+                echo "##vso[task.setvariable variable=webUiCaUrl;isOutput=true]$WEBUI_CA_URL"
+                echo "WEBUI_CA_URL value is: $WEBUI_CA_URL"
+
+##################### Launch End To End Testing #####################
+
+- stage: Launch_End_To_End_Testing
+  displayName: Launch end to end testing stage
+  dependsOn:
+  - Provision_Staging_Infrastructure
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  variables:
+    webUiCaUrl: $[ stageDependencies.Provision_Staging_Infrastructure.Deploy_Infrastructure_Staging.outputs['Deploy_Infrastructure_Staging.t1.webUiCaUrl'] ]
+  jobs:
+  - job: Run_End_To_End_Tests
+    pool:
+      name: Default
+      demands:
+      - PLAYWRIGHT_BROWSERS_PATH -equals /ms-playwright
+    steps:
+    - task: DotNetCoreCLI@2
+      displayName: Create a manifest file
+      inputs:
+        command: custom
+        custom: 'new'
+        arguments: tool-manifest
+    - task: DotNetCoreCLI@2
+      displayName: Install Playwright CLI
+      inputs:
+        command: custom
+        custom: 'tool'
+        arguments: install Microsoft.Playwright.CLI
+    - task: DotNetCoreCLI@2
+      displayName: Build ShoppingApp.E2ETests
+      inputs:
+        command: 'build'
+        projects: |
+          test/ShoppingApp.E2ETests
+    - task: DotNetCoreCLI@2
+      displayName: Install Playwright
+      inputs:
+        command: custom
+        custom: 'tool'
+        arguments: run playwright install
+    - task: DotNetCoreCLI@2
+      displayName: 'Run E2E Tests'
+      inputs:
+        command: test
+        arguments: '-- TestRunParameters.Parameter(name="\""webUiCaUrl"\"", value="\""$(webUiCaUrl)"\"")'
+        projects: |
+          test/ShoppingApp.E2ETests
+        publishTestResults: true
+
+##################### Launch Load Testing #####################
+
+- stage: Launch_Load_Testing
+  displayName: Launch load testing stage
+  dependsOn:
+  - Provision_Staging_Infrastructure
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  variables:
+    webUiCaUrl: $[ stageDependencies.Provision_Staging_Infrastructure.Deploy_Infrastructure_Staging.outputs['Deploy_Infrastructure_Staging.t1.webUiCaUrl'] ]
+    azureServiceConnection: 'DefaultAzureServiceConnection'
+    resourceGroupName: 'rg-$(appNamePrefix)'
+  jobs:
+  - job: Run_Load_Tests
+    pool:
+      name: Default
+    steps:
+    - task: AzureLoadTest@1
+      inputs:
+        azureSubscription: 'DefaultAzureServiceConnection'
+        loadTestConfigFile: 'test/ShoppingApp.LoadTests/ShoppingApp.WebUI.DefaultTests.yaml'
+        resourceGroup: $(resourceGroupName)-$(nameSuffix)
+        loadTestResource: 'lt-$(appNamePrefix)-$(nameSuffix)'
+        env: |
+          [
+            {
+            "name": "webUIUrl",
+            "value": "$(webUiCaUrl)"
+            }
+          ]

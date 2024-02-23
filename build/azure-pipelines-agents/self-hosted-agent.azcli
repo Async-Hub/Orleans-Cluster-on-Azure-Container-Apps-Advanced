@@ -1,0 +1,33 @@
+# Run a self-hosted agent in Docker: 
+# https://learn.microsoft.com/en-us/azure/devops/pipelines/agents/docker
+
+# Create Azure DevOps Personal Access Tokens. Name: OnDemandBuildAgents
+# For the scope select: Agent Pools (read, manage), Deployment group (read, manage).
+# qgc74oyl4fgjmlsvtqitvehplqbj2xzucbecvoos6wvry5gkeqsa
+
+# Bash Syntax
+# Warning! Doing Docker within a Docker by using Docker socket has 
+# serious security implications. The code inside the container can 
+# now run as root on your Docker host. Please be very careful.
+sudo docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+    -e AZP_URL=https://dev.azure.com/orleans-on-ctap1 \
+    -e AZP_TOKEN=<PAT token> -e AZP_AGENT_NAME=01_Ubuntu-20.04 \
+    -e AZP_POOL=Default -e AZP_WORK=_work --name 01_Ubuntu-20.04 azure-pipelines-agents-ubuntu-20.04:23022024
+
+# Bash Syntax
+# Warning! Doing Docker within a Docker by using Docker socket has 
+# serious security implications. The code inside the container can 
+# now run as root on your Docker host. Please be very careful.
+sudo docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+    -e AZP_URL=https://dev.azure.com/orleans-on-ctap1 \
+    -e AZP_TOKEN=<PAT token> -e AZP_AGENT_NAME=01_Debian-12.2 \
+    -e AZP_POOL=Default -e AZP_WORK=_work --name 01_Debian-12.2 azure-pipelines-agents-debian-12.2:23022024
+
+# Bash Syntax
+# Warning! Doing Docker within a Docker by using Docker socket has 
+# serious security implications. The code inside the container can 
+# now run as root on your Docker host. Please be very careful.
+sudo docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+    -e AZP_URL=https://dev.azure.com/orleans-on-ctap1 \
+    -e AZP_TOKEN=<PAT token> -e AZP_AGENT_NAME=01_Playwright-1.41.0 \
+    -e AZP_POOL=Default -e AZP_WORK=_work --name 01_Playwright-1.41.0 azure-pipelines-agents-playwright-1.41.0:23022024

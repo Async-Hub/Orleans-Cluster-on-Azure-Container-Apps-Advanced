@@ -1,0 +1,13 @@
+version: v0.1
+testId: ShoppingApp-WebUI-DefaultTests
+displayName: ShoppingApp.WebUI.DefaultTests
+testPlan: ShoppingApp.WebUI.DefaultTests.jmx
+description: 'Default load tests for ShoppingApp.WebUI'
+engineInstances: 1
+failureCriteria:
+  - avg(response_time_ms) > 500
+  - percentage(error) > 3
+  - GetHomePage: avg(latency) > 75
+  - GetHomePage: p95(response_time_ms) > 300
+  - GetProductsPage: avg(latency) > 150
+  - GetProductsPage: p95(response_time_ms) > 400

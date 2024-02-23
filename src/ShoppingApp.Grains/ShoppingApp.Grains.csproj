@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" />
+    <PackageReference Include="Microsoft.Orleans.Runtime" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Orleans.Sdk" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ShoppingApp.Abstractions\ShoppingApp.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>
