@@ -7,6 +7,9 @@ This is the modernized and up to date version of  sample provided by Microsoft (
 * Scalable server-side Blazor app on Azure Container Apps
 * Azure SignalR Service, Azure Key Vault, Azure Storage Account, Azure Application Insights, Azure Load Testing, Microsoft Playwright for E2E Tests, Azure DevOps and many more
 
+What is required for this solution?  
+> - Microsoft Azure Subscription, [you can create a free account](https://azure.microsoft.com/en-us/free/) if you don't have any.
+
 ### 1. Create an Azure DevOps project for the solution.
 
 1. Open Azure DevOps portal : https://dev.azure.com/
@@ -20,17 +23,19 @@ This is the modernized and up to date version of  sample provided by Microsoft (
 
 Install [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/) on operation system which you are using.  
 
->Attention! The next steps below (till section 3) are optional.
+>Attention! The steps outlined below, up to section 3, are optional
 
-If you are using Windows 11 or Windows 10 it is more appropriate to use WSL 2 and install Docker Desktop on Ubuntu-22.04.
+If you are using Windows 11 or Windows 10 it is more appropriate to use WSL 2 and install Docker Desktop on Ubuntu-22.04. Here 
+we have two options:
 
-What are required for this?  
-> - Microsoft Azure Subscription, [you can create a free account](https://azure.microsoft.com/en-us/free/) if you don't have any.
+- The first option is to use WSL 2 on the host operationg system.
+- The second option is to keep the host operating system clean and create a Windows 10/11 Virtual Machine with Hyper-V using [Nested Virtualization](https://learn.microsoft.com/en-us/virtualization/hyper-v-on-windows/user-guide/nested-virtualization). What are required for *Nested Virtualization*?  
 > - [Windows machine with virtualization technology (AMD-V / Intel VT-x)](https://learn.microsoft.com/en-us/virtualization/hyper-v-on-windows/user-guide/nested-virtualization)
 >   - Windows Server 2016/Windows 10 or greater for Intel processor with VT-x
 >   - Windows Server 2022/Windows 11 or greater AMD EPYC/Ryzen processor
+> - Enable [nested virtualization](https://learn.microsoft.com/en-us/windows/wsl/faq#can-i-run-wsl-2-in-a-virtual-machine-) on the Virtual Machine
 
-Open terminal enable WSL 2 and install Ubuntu-22.04 with the following command 
+Regardless of the option you chose above, you need to open a terminal on the host (for the first option) or on the VM (for the second option). Then enable WSL 2 and install Ubuntu 22.04 with the following command, typing it in the terminal window:
 ```
 wsl --install -d Ubuntu-22.04
 ```
