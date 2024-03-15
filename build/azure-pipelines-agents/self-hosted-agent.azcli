@@ -29,5 +29,5 @@ sudo docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
 # now run as root on your Docker host. Please be very careful.
 sudo docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
     -e AZP_URL=https://dev.azure.com/orleans-on-ctap1 \
-    -e AZP_TOKEN=<PAT token> -e AZP_AGENT_NAME=01_Playwright-1.42.1 \
-    -e AZP_POOL=Default -e AZP_WORK=_work --name 01_Playwright-1.42.1 azure-pipelines-agents-playwright-1.42.1:15032024
+    -e AZP_TOKEN=<PAT token> -e AZP_AGENT_NAME=01_Playwright-1.42.0 \
+    -e AZP_POOL=Default -e AZP_WORK=_work --name 01_Playwright-1.42.0 azure-pipelines-agents-playwright-1.42.0:15032024

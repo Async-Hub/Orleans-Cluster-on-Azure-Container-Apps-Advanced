@@ -82,7 +82,7 @@ sudo docker build -t azure-pipelines-agents-ubuntu-20.04:15032024 .
 ```
 Also create Playwright image
 ```
-sudo docker build -t azure-pipelines-agents-playwright-1.42.1:15032024 .
+sudo docker build -t azure-pipelines-agents-playwright-1.42.0:15032024 .
 ```
 Create [Azure DevOps personal access token (PAT token)](https://learn.microsoft.com/en-us/azure/devops/organizations/accounts/use-personal-access-tokens-to-authenticate). For the scope select: Agent Pools (read, manage), Deployment group (read, manage).  
 Run Debian or Ubuntu based Azure Pipelines agent by using the following command:
