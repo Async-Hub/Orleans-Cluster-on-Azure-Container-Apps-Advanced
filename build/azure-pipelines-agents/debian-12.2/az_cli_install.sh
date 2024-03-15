@@ -87,7 +87,7 @@ setup() {
     set +v
 
     assert_consent "Install the Azure CLI?" ${global_consent}
-	apt-get install -y azure-cli=2.57.0-1~$CLI_REPO
+	apt-get install -y azure-cli=2.58.0-1~$CLI_REPO
 
 }
 

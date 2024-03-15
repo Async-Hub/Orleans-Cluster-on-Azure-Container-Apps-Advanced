@@ -38,7 +38,7 @@
         </HeaderContent>
         <RowTemplate>
             <MudTd>
-                <MudFab Disabled=@(IsInCart?.Invoke(product) ?? false) Size="Size.Small"
+                <MudFab Disabled=@(IsInCart(product)) Size="Size.Small"
                         Color="Color.Primary" Icon=@Icons.Material.Filled.AddShoppingCart
                     OnClick=@(_ => AddToCartAsync(product.Id))/>
             </MudTd>

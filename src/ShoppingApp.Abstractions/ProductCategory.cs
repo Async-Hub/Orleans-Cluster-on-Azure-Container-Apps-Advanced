@@ -2,12 +2,14 @@
 
 public enum ProductCategory
 {
-    Accessories,
-    Hardware,
+	// ReSharper disable UnusedMember.Global
+	Accessories,
+	Hardware,
     Software,
     Books,
     Movies,
     Music,
     Games,
     Other
+    // ReSharper restore UnusedMember.Global
 }

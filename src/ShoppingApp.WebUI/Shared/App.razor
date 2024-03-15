@@ -7,15 +7,16 @@
 	<base href="/" />
 	<link rel="icon" type="image/png" href="favicon.png" />
 	<link rel="stylesheet" href="app.css" />
-	@* ReSharper disable once Html.PathError *@
+	@* ReSharper disable Html.PathError *@
 	<link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
+	@* ReSharper restore Html.PathError *@
 	<HeadOutlet />
 </head>
 <body>
 	<Routes @rendermode="@InteractiveServer" />
 	@* ReSharper disable Html.PathError *@
 	<script src="_framework/blazor.web.js"></script>
-	@* ReSharper restore Html.PathError *@
 	<script src="_content/MudBlazor/MudBlazor.min.js"></script>
+	@* ReSharper restore Html.PathError *@
 </body>
 </html>

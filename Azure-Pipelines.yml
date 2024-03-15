@@ -14,7 +14,8 @@ stages:
   pool:
     name: Default
     demands:
-        - dotnet
+      - dotnet
+      - JETBRAINS_RESHARPER_GLOBALTOOLS -equals 2023.3.4
   variables:
     buildPlatform: 'Any CPU'
     buildConfiguration: 'Release'
@@ -38,6 +39,21 @@ stages:
             test/ShoppingApp.Tests
             test/ShoppingApp.Tests.FSharp
           publishTestResults: true
+
+      - task: CmdLine@2
+        displayName: 'Inspect Code with ReSharper CLI'
+        inputs:
+          script: |
+            export PATH=$PATH:/resharpercli
+            jb inspectcode ShoppingApp.sln --no-build -f="Html;Xml" \
+            --profile="ShoppingApp.sln.DotSettings" -o="inspect-code-output" \
+            --properties:Configuration=$(buildConfiguration)
+      
+      - task: PowerShell@2
+        displayName: 'Analyze ReSharper CLI Results'
+        inputs:
+          targetType: filePath
+          filePath: ./AnalyzeReSharperCLIResults.ps1
 
 ##################### Packing Infrastructure Artifacts Stage #####################
 

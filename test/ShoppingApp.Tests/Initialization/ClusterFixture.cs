@@ -1,4 +1,5 @@
-﻿using Orleans.TestingHost;
+﻿using JetBrains.Annotations;
+using Orleans.TestingHost;
 using ShoppingApp.Grains;
 using Xunit;
 
@@ -8,6 +9,7 @@ public class ClusterFixture : IDisposable
 {
 	public TestCluster Cluster { get; }
 
+	[UsedImplicitly]
 	public ClusterFixture()
 	{
 		var builder = new TestClusterBuilder();
@@ -16,14 +18,14 @@ public class ClusterFixture : IDisposable
 		Cluster.Deploy();
 	}
 
-	public class TestSiloConfigurations : ISiloConfigurator
+	private class TestSiloConfigurations : ISiloConfigurator
 	{
 		public void Configure(ISiloBuilder siloBuilder)
 		{
 			siloBuilder.AddMemoryGrainStorage(PersistentStorageConfig.AzureSqlName)
 				.AddMemoryGrainStorage(PersistentStorageConfig.AzureStorageName);
 
-			siloBuilder.ConfigureServices(services => { });
+			siloBuilder.ConfigureServices(_ => { });
 		}
 	}
 

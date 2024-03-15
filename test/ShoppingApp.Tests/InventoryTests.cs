@@ -8,7 +8,7 @@ namespace ShoppingApp.Tests;
 [Collection(ClusterCollection.ClusterFixtureName)]
 public class InventoryTests(ClusterFixture clusterFixture)
 {
-	public TestCluster Cluster { get; } = clusterFixture.Cluster;
+	private TestCluster Cluster { get; } = clusterFixture.Cluster;
 
 	[Fact]
     public async Task VerifyingSuccessfulAdditionAndRetrievalOfProduct()

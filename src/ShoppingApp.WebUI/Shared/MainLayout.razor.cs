@@ -120,8 +120,12 @@ public partial class MainLayout : IDisposable
 
     private void LocationChanged(object? sender, LocationChangedEventArgs e)
     {
-        string navigationMethod = e.IsNavigationIntercepted ? "HTML" : "code";
-        //TelemetryClient.TrackPageView(e.Location);
+        var navigationMethod = e.IsNavigationIntercepted ? "HTML" : "code";
+        
+        if (navigationMethod == "HTML")
+        {
+	        TelemetryClient.TrackPageView(e.Location);
+        }
     }
 
     void IDisposable.Dispose()

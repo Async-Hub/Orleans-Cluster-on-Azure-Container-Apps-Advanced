@@ -37,14 +37,14 @@ public class PageWithApplicationInsights : ComponentBase
             dateTimeOffset, sw.Elapsed, "200", true);
     }
 
-    private void TrackEvent(Stopwatch sw)
-    {
-        var metrics = new Dictionary<string, double>
-            {{"processingTime", sw.Elapsed.TotalMilliseconds}};
+    //private void TrackEvent(Stopwatch sw)
+    //{
+    //    var metrics = new Dictionary<string, double>
+    //        {{"processingTime", sw.Elapsed.TotalMilliseconds}};
 
-        var properties = new Dictionary<string, string>
-            {{"pageName", NavigationManager.Uri}};
+    //    var properties = new Dictionary<string, string>
+    //        {{"pageName", NavigationManager.Uri}};
 
-        TelemetryClient.TrackEvent("BlazorPageProcessed", properties, metrics);
-    }
+    //    TelemetryClient.TrackEvent("BlazorPageProcessed", properties, metrics);
+    //}
 }

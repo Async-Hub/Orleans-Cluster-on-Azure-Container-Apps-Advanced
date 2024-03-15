@@ -12,7 +12,8 @@
 		<PackageReference Include="Azure.Identity" Version="1.10.4" />
 		<PackageReference Include="Blazor.Serialization" Version="8.0.0" />
 		<PackageReference Include="Blazor.LocalStorage" Version="8.0.0" />
-		<PackageReference Include="Bogus" Version="35.4.1" />
+		<PackageReference Include="Bogus" Version="35.5.0" />
+		<PackageReference Include="JetBrains.Annotations" Version="2023.3.0" />
 		<PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
 		<PackageReference Include="Microsoft.Azure.SignalR" Version="1.25.1" />
 		<PackageReference Include="Microsoft.Extensions.Azure" Version="1.7.2" />

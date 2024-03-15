@@ -31,22 +31,22 @@ public partial class ProductTable
         }
     }
 
-    void BackupItem(object model)
+    private void BackupItem(object model)
     {
         if (model is ProductDetails product)
         {
-            _productBeforeEdit = product;
+            _productBeforeEdit = product with { };
         }
     }
 
-    void RevertEditChanges(object model)
+    private void RevertEditChanges(object model)
     {
         if (model is ProductDetails product &&
             _productBeforeEdit is not null)
         {
-            model = _productBeforeEdit with { };
+            product.Copy(_productBeforeEdit);
         }
     }
 
-    bool OnFilter(ProductDetails product) => product.MatchesFilter(_filter);
+    private bool OnFilter(ProductDetails product) => product.MatchesFilter(_filter);
 }

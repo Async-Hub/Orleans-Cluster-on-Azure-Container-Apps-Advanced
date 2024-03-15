@@ -92,7 +92,7 @@ app.MapGet("/", () =>
 	var assembly = Assembly.GetExecutingAssembly();
 	var version = AppInfo.RetrieveInformationalVersion(assembly);
 	
-	return "App version: [ {version} ]. Status: Running...";
+	return $"App version: [ {version} ]. Status: Running...";
 });
 
 app.Run();

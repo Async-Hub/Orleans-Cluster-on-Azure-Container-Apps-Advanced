@@ -53,6 +53,5 @@ public sealed partial class ProductsPage
         StateHasChanged();
     }
 
-    private Task OnEditProduct(ProductDetails product) =>
-        product is not null ? OnProductUpdated(product) : Task.CompletedTask;
+    private Task OnEditProduct(ProductDetails product) => OnProductUpdated(product);
 }

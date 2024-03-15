@@ -1,4 +1,5 @@
 ﻿using Bogus;
+using JetBrains.Annotations;
 using ShoppingApp.Abstractions;
 
 namespace ShoppingApp.SiloHost;
@@ -17,6 +18,7 @@ internal static class ProductDetailsExtensions
             .RuleFor(p => p.Category, (f, _) => f.PickRandom<ProductCategory>())
             .RuleFor(p => p.DetailsUrl, (f, _) => f.Internet.Url());
 
+    [UsedImplicitly]
     internal static bool MatchesFilter(this ProductDetails? product, string? filter)
     {
         if (filter is null or { Length: 0 })

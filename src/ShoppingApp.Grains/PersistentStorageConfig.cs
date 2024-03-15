@@ -1,6 +1,6 @@
 ﻿namespace ShoppingApp.Grains;
 
-public sealed class PersistentStorageConfig
+public static class PersistentStorageConfig
 {
     public const string AzureSqlName = "AzureSql";
 
