@@ -15,7 +15,7 @@ stages:
     name: Default
     demands:
       - dotnet
-      - JETBRAINS_RESHARPER_GLOBALTOOLS -equals 2023.3.4
+      - JETBRAINS_RESHARPER_GLOBALTOOLS -equals 2024.1.1
   variables:
     buildPlatform: 'Any CPU'
     buildConfiguration: 'Release'
@@ -253,6 +253,10 @@ stages:
                   acrName='$(acrName)' acrUrl='$(acrUrl)' acrResourceGroupName='$(acrResourceGroupName)' \
                   executorSecurityPrincipal=${servicePrincipalId} --query properties.outputs)
                 WEBUI_CA_URL=$(jq --raw-output '.webUiCaUrl.value' <<< $DEPLOYMENT_OUTPUT)
+                if [[ -z $WEBUI_CA_URL ]]; then
+                  echo "Error: WEBUI_CA_URL is empty"
+                  exit 1
+                fi
                 echo "##vso[task.setvariable variable=webUiCaUrl;isOutput=true]$WEBUI_CA_URL"
                 echo "WEBUI_CA_URL value is: $WEBUI_CA_URL"
 

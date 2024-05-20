@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/playwright/python:v1.42.0-focal
+FROM mcr.microsoft.com/playwright/python:v1.43.0-jammy
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
