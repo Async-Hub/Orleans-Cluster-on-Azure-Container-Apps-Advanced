@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/playwright/python:v1.43.0-jammy
+FROM mcr.microsoft.com/playwright/python:v1.45.0-jammy
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
@@ -20,6 +20,7 @@ RUN dotnet tool install --global Microsoft.Playwright.CLI --version 1.2.3
 
 # Can be 'linux-x64', 'linux-arm64', 'linux-arm', 'rhel.6-x64'.
 ENV TARGETARCH=linux-x64
+ENV RUN_AGENT_ONCE=False
 
 WORKDIR /azp
 

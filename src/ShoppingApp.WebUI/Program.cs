@@ -1,3 +1,4 @@
+using Azure.Data.Tables;
 using Microsoft.ApplicationInsights.Extensibility;
 using MudBlazor.Services;
 using Orleans.Configuration;
@@ -64,7 +65,7 @@ else
             })
             .UseAzureStorageClustering(options =>
             {
-                options.ConfigureTableServiceClient(GlobalConfig.AzureStorageConnection);
+                options.TableServiceClient = new TableServiceClient(GlobalConfig.AzureStorageConnection);
             });
     });
 }

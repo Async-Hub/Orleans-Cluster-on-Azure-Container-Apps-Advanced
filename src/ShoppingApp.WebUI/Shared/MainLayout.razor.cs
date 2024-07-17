@@ -24,7 +24,7 @@ public partial class MainLayout : IDisposable
 
     private readonly MudTheme _theme = new()
     {
-        Palette = new PaletteLight()
+        PaletteLight = new PaletteLight()
         {
             Tertiary = "#7e6fff",
             DrawerIcon = "#aaa9b9",
@@ -37,7 +37,7 @@ public partial class MainLayout : IDisposable
             Tertiary = "#7e6fff",
             Surface = "#1e1e2d",
             Background = "#1a1a27",
-            BackgroundGrey = "#151521",
+            BackgroundGray = "#151521",
             AppbarText = "#92929f",
             AppbarBackground = "rgba(26,26,39,0.8)",
             DrawerBackground = "#1a1a27",

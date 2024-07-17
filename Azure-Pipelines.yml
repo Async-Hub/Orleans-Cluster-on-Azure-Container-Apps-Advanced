@@ -14,8 +14,8 @@ stages:
   pool:
     name: Default
     demands:
-      - dotnet
-      - JETBRAINS_RESHARPER_GLOBALTOOLS -equals 2024.1.1
+        - dotnet
+        - JETBRAINS_RESHARPER_GLOBALTOOLS -equals 2024.1.4
   variables:
     buildPlatform: 'Any CPU'
     buildConfiguration: 'Release'
@@ -54,7 +54,7 @@ stages:
         inputs:
           targetType: filePath
           filePath: ./AnalyzeReSharperCLIResults.ps1
-
+          
 ##################### Packing Infrastructure Artifacts Stage #####################
 
 - stage: Packing_Infrastructure_Artifacts
@@ -126,6 +126,10 @@ stages:
           # Retrieve the output values from the deployment
           ACR_NAME=$(jq --raw-output '.acrName.value' <<< $ACR_CREDENTIALS)
           ACR_URL=$(jq --raw-output '.acrUrl.value' <<< $ACR_CREDENTIALS)
+          if [[ -z $ACR_URL ]]; then
+            echo "Error: ACR_URL is empty"
+            exit 1
+          fi
           echo "Setting ACR_CREDENTIALS for output"
           echo "##vso[task.setvariable variable=acrName;isOutput=true]$ACR_NAME"
           echo "##vso[task.setvariable variable=acrUrl;isOutput=true]$ACR_URL"

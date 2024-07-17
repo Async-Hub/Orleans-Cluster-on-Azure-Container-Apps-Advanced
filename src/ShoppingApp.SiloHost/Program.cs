@@ -1,3 +1,4 @@
+using Azure.Data.Tables;
 using Microsoft.ApplicationInsights.Extensibility;
 using Orleans.Configuration;
 using ShoppingApp.Common;
@@ -71,9 +72,15 @@ builder.Host.UseOrleans((context, siloBuilder) =>
 				options.ClusterId = "ShoppingApp";
 				options.ServiceId = "ShoppingAppService";
 			})
-			.UseAzureStorageClustering(options => options.ConfigureTableServiceClient(azureStorageConnectionString))
+			.UseAzureStorageClustering(options =>
+            {
+                options.TableServiceClient = new TableServiceClient(azureStorageConnectionString);
+            })
 			.AddAzureTableGrainStorage(PersistentStorageConfig.AzureStorageName,
-				options => options.ConfigureTableServiceClient(azureStorageConnectionString))
+				options =>
+                {
+                    options.TableServiceClient = new TableServiceClient(azureStorageConnectionString);
+                })
 			.AddAdoNetGrainStorage(PersistentStorageConfig.AzureSqlName, options =>
 		{
 			options.Invariant = "System.Data.SqlClient";
