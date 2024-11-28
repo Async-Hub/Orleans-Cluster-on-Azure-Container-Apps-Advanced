@@ -3,7 +3,7 @@
 This is the modernized and up to date version of  sample provided by Microsoft ([Orleans Cluster on Azure Container Apps](https://github.com/Azure-Samples/Orleans-Cluster-on-Azure-Container-Apps)). It uses:
 
 * Fully automated Azure Pipelines to deploy from code to cloud with minimal effort
-* Blazor Server model which works on .NET 8 and Microsoft Orleans 8
+* Blazor Server model which works on .NET 9 and Microsoft Orleans 9
 * Scalable server-side Blazor app on Azure Container Apps
 * Azure SignalR Service, Azure Key Vault, Azure Storage Account, Azure Application Insights, Azure Load Testing, Microsoft Playwright for E2E Tests, Azure DevOps and many more
 
@@ -66,31 +66,31 @@ git clone https://dev.azure.com/orleans-on-ctap1/_git/ShoppingApp
 ```
 and interop with it from Ubuntu-22.04 by the following way:
 ```
-$ cd /mnt/c/Repos/ShoppingApp/build/azure-pipelines-agents/debian-12.2/
-$ sudo docker build -t azure-pipelines-agents-debian-12.2:11072024 .
+$ cd /mnt/c/Repos/ShoppingApp/build/azure-pipelines-agents/debian-12.x/
+$ sudo docker build -t azure-pipelines-agents-debian-12.7:27112024 .
 ```
 
 ### 3. Create a self-hosted agents pool for the Azure DevOps organization.
 
 Build an agent docker image by using files from "build\azure-pipelines-agents" based on Debian image
 ```
-sudo docker build -t azure-pipelines-agents-debian-12.2:11072024 .
+docker build -t azure-pipelines-agents-debian-12.7:27112024 .
 ```
 or on Ubuntu image.
 ```
-sudo docker build -t azure-pipelines-agents-ubuntu-20.04:11072024 .
+docker build -t azure-pipelines-agents-ubuntu-24.04:27112024 .
 ```
 Also create Playwright image
 ```
-sudo docker build -t azure-pipelines-agents-playwright-1.x:1.43.0.11072024 .
+docker build -t azure-pipelines-agents-playwright-1.x:1.49.0.27112024 .
 ```
 Create [Azure DevOps personal access token (PAT token)](https://learn.microsoft.com/en-us/azure/devops/organizations/accounts/use-personal-access-tokens-to-authenticate). For the scope select: Agent Pools (read, manage), Deployment group (read, manage).  
 Run Debian or Ubuntu based Azure Pipelines agent by using the following command:
 ```
-sudo docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
     -e AZP_URL=https://dev.azure.com/orleans-on-ctap1 \
-    -e AZP_TOKEN=<PAT token> -e AZP_AGENT_NAME=01_debian-12.2 \
-    -e AZP_POOL=Default -e AZP_WORK=_work --name 01_debian-12.2 azure-pipelines-agents-debian-12.2:11072024
+    -e AZP_TOKEN=<PAT token> -e AZP_AGENT_NAME=01_debian-12.7 \
+    -e AZP_POOL=Default -e AZP_WORK=_work --name 01_debian-12.7 azure-pipelines-agents-debian-12.7:27112024
 ```
 The syntax above uses Bash. If you use PowerShell shell, just replace "\\" (backslash) with "`" (backtick).  
   

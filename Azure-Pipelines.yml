@@ -15,7 +15,6 @@ stages:
     name: Default
     demands:
         - dotnet
-        - JETBRAINS_RESHARPER_GLOBALTOOLS -equals 2024.1.4
   variables:
     buildPlatform: 'Any CPU'
     buildConfiguration: 'Release'
@@ -39,7 +38,7 @@ stages:
             test/ShoppingApp.Tests
             test/ShoppingApp.Tests.FSharp
           publishTestResults: true
-
+          
       - task: CmdLine@2
         displayName: 'Inspect Code with ReSharper CLI'
         inputs:
@@ -54,7 +53,7 @@ stages:
         inputs:
           targetType: filePath
           filePath: ./AnalyzeReSharperCLIResults.ps1
-          
+
 ##################### Packing Infrastructure Artifacts Stage #####################
 
 - stage: Packing_Infrastructure_Artifacts
@@ -98,7 +97,7 @@ stages:
   variables:
     azureServiceConnection: 'DefaultAzureServiceConnection'
     resourceGroupName: 'rg-shopping-app-main'
-    location: 'eastus'
+    location: 'francecentral'
     templateFile: '$(Pipeline.Workspace)/infrastructure/azure-container-registry.bicep'
   jobs:
   - job: Deploy_Azure_Container_Registry
@@ -155,12 +154,12 @@ stages:
     displayName: Push container images
     steps:
     # Version with GitVersion
-    - task: gitversion/setup@0
+    - task: gitversion/setup@3.0.3
       displayName: Install GitVersion
       inputs:
-        versionSpec: '5.x'
+        versionSpec: '6.x'
 
-    - task: gitversion/execute@0
+    - task: gitversion/execute@3.0.3
       displayName: Execute GitVersion
 
     # Print SemVer Number
@@ -208,7 +207,7 @@ stages:
   variables:
       azureServiceConnection: 'DefaultAzureServiceConnection'
       resourceGroupName: 'rg-$(appNamePrefix)'
-      location: 'eastus'
+      location: 'francecentral'
       templateFile: '$(Pipeline.Workspace)/infrastructure/solution-infrastructure.bicep'
       acrUrl: $[ stageDependencies.Provision_Azure_Container_Registry.Deploy_Azure_Container_Registry.outputs['t2.acrUrl'] ]
       acrName: $[ stageDependencies.Provision_Azure_Container_Registry.Deploy_Azure_Container_Registry.outputs['t2.acrName'] ]
@@ -232,12 +231,12 @@ stages:
               path: $(Pipeline.Workspace)/infrastructure
           
           # Version with GitVersion
-          - task: gitversion/setup@0
+          - task: gitversion/setup@3.0.3
             displayName: Install GitVersion
             inputs:
-              versionSpec: '5.x'
+              versionSpec: '6.x'
 
-          - task: gitversion/execute@0
+          - task: gitversion/execute@3.0.3
             displayName: Execute GitVersion
 
           - task: AzureCLI@2

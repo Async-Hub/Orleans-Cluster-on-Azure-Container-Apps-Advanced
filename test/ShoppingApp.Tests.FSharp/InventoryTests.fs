@@ -14,7 +14,7 @@ type InventoryTests(clusterFixture: ClusterFixture, output: ITestOutputHelper) =
     member _.``Verifying Successful Addition and Retrieval of a Product``() =
         async {
             // Arrange
-            let grain = cluster.GrainFactory.GetGrain<IInventoryGrain>(String.Empty)
+            let grain = cluster.GrainFactory.GetGrain<IInventoryGrain>(nameof(IInventoryGrain))
             
             // Act
             do! grain.AddOrUpdateProductAsync(new ProductDetails(Id = "1", Name = "Test")) |> Async.AwaitTask

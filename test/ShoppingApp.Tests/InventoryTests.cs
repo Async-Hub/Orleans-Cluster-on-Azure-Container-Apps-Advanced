@@ -14,7 +14,7 @@ public class InventoryTests(ClusterFixture clusterFixture)
     public async Task VerifyingSuccessfulAdditionAndRetrievalOfProduct()
 	{
 		// Arrange
-		var grain = Cluster.GrainFactory.GetGrain<IInventoryGrain>(string.Empty);
+		var grain = Cluster.GrainFactory.GetGrain<IInventoryGrain>(nameof(IInventoryGrain));
 
 		// Act
 		await grain.AddOrUpdateProductAsync(new ProductDetails { Id = "1", Name = "Test" });

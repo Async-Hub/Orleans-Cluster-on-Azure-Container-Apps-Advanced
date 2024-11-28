@@ -1,6 +1,6 @@
 ### How to prune everything in Docker?
 ```
-docker system prune --all
+sudo docker system prune --all
 ```
 ### How to reboot WSL2 in Windows 10/11?
 ```
@@ -19,8 +19,8 @@ sudo docker login -u [user-name] --password-stdin [password]
 ```
 ### How to tag and push an image to Docker Hub?
 ```
-sudo docker tag [image id] [account or namespace]/azure-pipelines-agents-debian-12.2:11072024
-sudo docker push [account or namespace]/azure-pipelines-agents-debian-12.2:11072024
+sudo docker tag [image id] [account or namespace]/azure-pipelines-agents-debian-12.7:27112024
+sudo docker push [account or namespace]/azure-pipelines-agents-debian-12.7:27112024
 ```
 ### How to run container on WSL2?
 ```

@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/playwright/python:v1.45.0-jammy
+FROM mcr.microsoft.com/playwright/python:v1.49.0-jammy
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
@@ -8,12 +8,12 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommend
     curl git iputils-ping jq lsb-release openssh-client \
     software-properties-common
 
-# Install the .NET SDK 8.0
+# Install the .NET SDK 9.0
 RUN apt-get install wget
 RUN wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
 RUN dpkg -i packages-microsoft-prod.deb
 RUN rm packages-microsoft-prod.deb
-RUN apt-get update && apt-get install -y dotnet-sdk-8.0
+RUN apt-get update && apt-get install -y dotnet-sdk-9.0
 
 # Install Playwright
 RUN dotnet tool install --global Microsoft.Playwright.CLI --version 1.2.3

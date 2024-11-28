@@ -1,6 +1,6 @@
 ﻿using System.Data;
-using System.Data.SqlClient;
 using System.Reflection;
+using Microsoft.Data.SqlClient;
 
 namespace ShoppingApp.SiloHost.MicrosoftSqlServer;
 

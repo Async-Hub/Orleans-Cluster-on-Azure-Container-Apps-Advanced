@@ -1,3 +1,6 @@
+using System.Net;
+using System.Net.Sockets;
+using System.Reflection;
 using Azure.Data.Tables;
 using Microsoft.ApplicationInsights.Extensibility;
 using Orleans.Configuration;
@@ -5,9 +8,6 @@ using ShoppingApp.Common;
 using ShoppingApp.Grains;
 using ShoppingApp.SiloHost;
 using ShoppingApp.SiloHost.MicrosoftSqlServer;
-using System.Net;
-using System.Net.Sockets;
-using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -83,7 +83,7 @@ builder.Host.UseOrleans((context, siloBuilder) =>
                 })
 			.AddAdoNetGrainStorage(PersistentStorageConfig.AzureSqlName, options =>
 		{
-			options.Invariant = "System.Data.SqlClient";
+			options.Invariant = "Microsoft.Data.SqlClient";
 			options.ConnectionString = azureSqlConnectionString;
 			//options.UseJsonFormat = true;
 		});

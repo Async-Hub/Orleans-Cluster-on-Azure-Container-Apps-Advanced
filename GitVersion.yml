@@ -1,5 +1,4 @@
-mode: ContinuousDeployment
-branches: {}
-ignore:
-  sha: []
-merge-message-formats: {}
+branches:
+  main:
+    mode: ContinuousDelivery
+    label: ci

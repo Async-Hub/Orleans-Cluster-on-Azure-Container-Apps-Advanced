@@ -1,10 +1,10 @@
 #See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
-FROM mcr.microsoft.com/dotnet/runtime-deps:8.0-jammy-chiseled-amd64 AS base
+FROM mcr.microsoft.com/dotnet/runtime-deps:9.0-noble-chiseled-extra-amd64 AS base
 WORKDIR /app
 EXPOSE 8080
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 
 ARG assemblyInformationalVersion=1.0.0
 
