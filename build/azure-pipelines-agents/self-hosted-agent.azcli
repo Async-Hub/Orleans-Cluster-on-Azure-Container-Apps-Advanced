@@ -10,7 +10,7 @@
 # serious security implications. The code inside the container can 
 # now run as root on your Docker host. Please be very careful.
 sudo docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
-    -e AZP_URL=https://dev.azure.com/azure-pipelines-immersion-1 \
+    -e AZP_URL=https://dev.azure.com/orleans-on-ctap1 \
     -e AZP_TOKEN=<PAT token> -e AZP_AGENT_NAME=01_ubuntu-24.04 \
     -e AZP_POOL=Default -e AZP_WORK=_work --name 01_ubuntu-24.04 azure-pipelines-agents-ubuntu-24.04:27112024
 
@@ -19,7 +19,7 @@ sudo docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
 # serious security implications. The code inside the container can 
 # now run as root on your Docker host. Please be very careful.
 sudo docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
-    -e AZP_URL=https://dev.azure.com/azure-pipelines-immersion-1 \
+    -e AZP_URL=https://dev.azure.com/orleans-on-ctap1 \
     -e AZP_TOKEN=<PAT token> -e AZP_AGENT_NAME=01_Debian-12.7 \
     -e AZP_POOL=Default -e AZP_WORK=_work --name 01_Debian-12.7 azure-pipelines-agents-debian-12.7:27112024
 
@@ -28,6 +28,6 @@ sudo docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
 # serious security implications. The code inside the container can 
 # now run as root on your Docker host. Please be very careful.
 sudo docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
-    -e AZP_URL=https://dev.azure.com/azure-pipelines-immersion-1 \
+    -e AZP_URL=https://dev.azure.com/orleans-on-ctap1 \
     -e AZP_TOKEN=<PAT token> -e AZP_AGENT_NAME=01_Playwright-1.49.0 \
     -e AZP_POOL=Default -e AZP_WORK=_work --name 01_Playwright-1.49.0 azure-pipelines-agents-playwright-1.x:1.49.0.27112024

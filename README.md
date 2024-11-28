@@ -1,5 +1,7 @@
 ## Microsoft Orleans cluster on Azure-Container Apps advanced
 
+### This solution uses Azure Pipelines based CI/CD. For GitHub Actions samples please [see this repository](https://github.com/Async-Hub/Orleans-Cluster-on-Azure-Container-Apps-Advanced-GitHub).
+
 This is the modernized and up to date version of  sample provided by Microsoft ([Orleans Cluster on Azure Container Apps](https://github.com/Azure-Samples/Orleans-Cluster-on-Azure-Container-Apps)). It uses:
 
 * Fully automated Azure Pipelines to deploy from code to cloud with minimal effort
