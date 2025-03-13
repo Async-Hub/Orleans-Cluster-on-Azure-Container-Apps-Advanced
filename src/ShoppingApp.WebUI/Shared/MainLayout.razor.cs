@@ -90,7 +90,7 @@ public partial class MainLayout : IDisposable
         {
             ToastService.OnToastedRequested += OnToastRequested;
 
-            if (await LocalStorage.GetItemAsync(PrefersDarkThemeKey)
+            if (await LocalStorage.GetItemAsync<string>(PrefersDarkThemeKey)
                 is { Length: > 0 } isDarkTheme &&
                 bool.TryParse(isDarkTheme, out var parsedValue))
             {

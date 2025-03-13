@@ -44,7 +44,7 @@ resource acr 'Microsoft.ContainerRegistry/registries@2022-12-01' existing = {
   scope: resourceGroup(acrResourceGroupName)
 }
 
-resource loadTest 'Microsoft.LoadTestService/loadTests@2022-12-01' = {
+resource loadTest 'Microsoft.LoadTestService/loadTests@2023-12-01-preview' = {
   name: loadTestName
   location: location
   tags: tags

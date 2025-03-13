@@ -26,20 +26,22 @@ public sealed partial class ProductsPage
     protected override async Task OnInitializedAsync() =>
         _products = await InventoryService.GetAllProductsAsync();
 
-    private void CreateNewProduct()
+    private async Task CreateNewProduct()
     {
         if (_modal is not null)
         {
             var product = new ProductDetails();
             var faker = product.GetBogusFaker();
             var fake = faker.Generate();
+            
             _modal.Product = product with
             {
                 Id = fake.Id,
                 ImageUrl = fake.ImageUrl,
                 DetailsUrl = fake.DetailsUrl
             };
-            _modal.Open("Create Product", OnProductUpdated);
+            
+            await _modal.OpenAsync("Create Product", OnProductUpdated);
         }
     }
 

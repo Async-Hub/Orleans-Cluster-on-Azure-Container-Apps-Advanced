@@ -7,13 +7,13 @@ namespace ShoppingApp.WebUI.Products;
 
 public partial class ManageProductModal
 {
-    bool _isSaving;
-    MudForm? _form;
+    private bool _isSaving;
+    private MudForm? _form;
 
     public ProductDetails Product { get; set; } = new();
 
-    [CascadingParameter]
-    MudDialogInstance? MudDialog { get; set; }
+    [CascadingParameter] 
+    private IMudDialogInstance? MudDialog { get; set; }
 
     [Parameter, EditorRequired]
     public EventCallback<ProductDetails> ProductUpdated { get; set; }
@@ -21,8 +21,8 @@ public partial class ManageProductModal
     [Inject]
     public IDialogService DialogService { get; set; } = null!;
 
-    public void Open(string title, Func<ProductDetails, Task> onProductUpdated) =>
-        DialogService.Show<ManageProductModal>(
+    public async Task OpenAsync(string title, Func<ProductDetails, Task> onProductUpdated) =>
+        await DialogService.ShowAsync<ManageProductModal>(
             title, new DialogParameters()
             {
                 {

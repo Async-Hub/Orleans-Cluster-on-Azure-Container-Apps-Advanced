@@ -69,22 +69,22 @@ git clone https://dev.azure.com/orleans-on-ctap1/_git/ShoppingApp
 and interop with it from Ubuntu-22.04 by the following way:
 ```
 $ cd /mnt/c/Repos/ShoppingApp/build/azure-pipelines-agents/debian-12.x/
-$ sudo docker build -t azure-pipelines-agents-debian-12.7:27112024 .
+$ sudo docker build -t azure-pipelines-agents-debian-12.7:11032025 .
 ```
 
 ### 3. Create a self-hosted agents pool for the Azure DevOps organization.
 
 Build an agent docker image by using files from "build\azure-pipelines-agents" based on Debian image
 ```
-docker build -t azure-pipelines-agents-debian-12.7:27112024 .
+docker build -t azure-pipelines-agents-debian-12.7:11032025 .
 ```
 or on Ubuntu image.
 ```
-docker build -t azure-pipelines-agents-ubuntu-24.04:27112024 .
+docker build -t azure-pipelines-agents-ubuntu-24.04:11032025 .
 ```
 Also create Playwright image
 ```
-docker build -t azure-pipelines-agents-playwright-1.x:1.49.0.27112024 .
+docker build -t azure-pipelines-agents-playwright-1.x:1.50.0.11032025 .
 ```
 Create [Azure DevOps personal access token (PAT token)](https://learn.microsoft.com/en-us/azure/devops/organizations/accounts/use-personal-access-tokens-to-authenticate). For the scope select: Agent Pools (read, manage), Deployment group (read, manage).  
 Run Debian or Ubuntu based Azure Pipelines agent by using the following command:
@@ -92,7 +92,7 @@ Run Debian or Ubuntu based Azure Pipelines agent by using the following command:
 docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
     -e AZP_URL=https://dev.azure.com/orleans-on-ctap1 \
     -e AZP_TOKEN=<PAT token> -e AZP_AGENT_NAME=01_debian-12.7 \
-    -e AZP_POOL=Default -e AZP_WORK=_work --name 01_debian-12.7 azure-pipelines-agents-debian-12.7:27112024
+    -e AZP_POOL=Default -e AZP_WORK=_work --name 01_debian-12.7 azure-pipelines-agents-debian-12.7:11032025
 ```
 The syntax above uses Bash. If you use PowerShell shell, just replace "\\" (backslash) with "`" (backtick).  
   
@@ -115,5 +115,7 @@ Install [Azure Load Testing](https://marketplace.visualstudio.com/items?itemName
 Disable [shallow fetch](https://learn.microsoft.com/en-us/azure/devops/pipelines/yaml-schema/steps-checkout?view=azure-pipelines#shallow-fetch) for the Azure Pipeline. It's required for GitTools.
 
 ### 5. Run the Azure Pipeline.
+
+>Warning! If you experience DNS resolution issues on an Azure Pipelines Agent, especially with the Azure Load Testing Service, try starting the container with Google's default DNS (8.8.8.8).
 
 Run the Azure Pipeline, wait till it completely deploy the solution and enjoy it.

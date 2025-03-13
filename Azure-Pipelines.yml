@@ -38,7 +38,7 @@ stages:
             test/ShoppingApp.Tests
             test/ShoppingApp.Tests.FSharp
           publishTestResults: true
-          
+
       - task: CmdLine@2
         displayName: 'Inspect Code with ReSharper CLI'
         inputs:
@@ -47,13 +47,13 @@ stages:
             jb inspectcode ShoppingApp.sln --no-build -f="Html;Xml" \
             --profile="ShoppingApp.sln.DotSettings" -o="inspect-code-output" \
             --properties:Configuration=$(buildConfiguration)
-      
+        
       - task: PowerShell@2
         displayName: 'Analyze ReSharper CLI Results'
         inputs:
           targetType: filePath
           filePath: ./AnalyzeReSharperCLIResults.ps1
-
+          
 ##################### Packing Infrastructure Artifacts Stage #####################
 
 - stage: Packing_Infrastructure_Artifacts
@@ -157,7 +157,7 @@ stages:
     - task: gitversion/setup@3.0.3
       displayName: Install GitVersion
       inputs:
-        versionSpec: '6.x'
+        versionSpec: '6.0.x'
 
     - task: gitversion/execute@3.0.3
       displayName: Execute GitVersion
@@ -234,7 +234,7 @@ stages:
           - task: gitversion/setup@3.0.3
             displayName: Install GitVersion
             inputs:
-              versionSpec: '6.x'
+              versionSpec: '6.0.x'
 
           - task: gitversion/execute@3.0.3
             displayName: Execute GitVersion
@@ -280,29 +280,11 @@ stages:
       - PLAYWRIGHT_BROWSERS_PATH -equals /ms-playwright
     steps:
     - task: DotNetCoreCLI@2
-      displayName: Create a manifest file
-      inputs:
-        command: custom
-        custom: 'new'
-        arguments: tool-manifest
-    - task: DotNetCoreCLI@2
-      displayName: Install Playwright CLI
-      inputs:
-        command: custom
-        custom: 'tool'
-        arguments: install Microsoft.Playwright.CLI
-    - task: DotNetCoreCLI@2
       displayName: Build ShoppingApp.E2ETests
       inputs:
         command: 'build'
         projects: |
           test/ShoppingApp.E2ETests
-    - task: DotNetCoreCLI@2
-      displayName: Install Playwright
-      inputs:
-        command: custom
-        custom: 'tool'
-        arguments: run playwright install
     - task: DotNetCoreCLI@2
       displayName: 'Run E2E Tests'
       inputs:

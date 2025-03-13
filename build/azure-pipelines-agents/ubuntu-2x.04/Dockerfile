@@ -36,18 +36,11 @@ RUN rm packages-microsoft-prod.deb
 RUN apt-get update && apt-get install -y dotnet-sdk-9.0
 
 # https://blog.jetbrains.com/dotnet/2020/07/16/resharper-command-line-tools-cross-platform-and-global-tools/#usage-as-global-tools
-RUN dotnet tool install JetBrains.ReSharper.GlobalTools --tool-path /resharpercli --version 2024.3.0
-ENV JETBRAINS_RESHARPER_GLOBALTOOLS=2024.3.0
+RUN dotnet tool install JetBrains.ReSharper.GlobalTools --tool-path /resharpercli --version 2024.3.6
+ENV JETBRAINS_RESHARPER_GLOBALTOOLS=2024.3.6
 
 # Install PowerShell
-# Download the PowerShell package file
-RUN wget https://github.com/PowerShell/PowerShell/releases/download/v7.4.6/powershell_7.4.6-1.deb_amd64.deb
-# Install the PowerShell package
-RUN dpkg -i powershell_7.4.6-1.deb_amd64.deb
-# Resolve missing dependencies and finish the install (if necessary)
-RUN apt-get install -f
-# Delete the downloaded package file
-RUN rm powershell_7.4.6-1.deb_amd64.deb
+RUN apt-get install -y powershell
 
 # Install Docker Engine on Debian
 # Use Docker within a Docker container
@@ -66,5 +59,15 @@ WORKDIR /azp
 # Run a self-hosted Azure Pipelines agent in Docker
 COPY ./start.sh .
 RUN chmod +x start.sh
+
+# Skip creating a restricted user for running Docker in Docker.
+# Warning! Doing Docker within a Docker by using Docker socket has serious security implications. 
+# The code inside the container can now run as root on your Docker host. Please be very careful.
+
+ENV AGENT_ALLOW_RUNASROOT="true"
+
+# Create agent user and set up home directory
+# RUN useradd -m -d /home/agent agent
+# RUN chown -R agent:agent /azp /home/agent
 
 ENTRYPOINT [ "./start.sh" ]

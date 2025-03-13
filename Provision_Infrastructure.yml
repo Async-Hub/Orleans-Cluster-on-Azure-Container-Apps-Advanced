@@ -1,0 +1,85 @@
+parameters:
+- name: name
+  type: string
+  default: 'Staging'
+
+- name: appNamePrefix
+  type: string
+
+- name: nameSuffix
+  type: string
+
+- name: location
+  type: string
+
+- name: azureServiceConnection
+  type: string
+
+stages:
+- stage: Provision_${{ parameters.name }}_Infrastructure
+  displayName: Provision ${{ parameters.name }} infrastructure stage
+  dependsOn:
+  - Provision_Azure_Container_Registry
+  - Publishing_Solution_Artifacts_Stage
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  variables:
+      appNamePrefix: ${{ parameters.appNamePrefix }}
+      nameSuffix: ${{ parameters.nameSuffix }}
+      resourceGroupName: 'rg-${{ parameters.appNamePrefix }}-${{ parameters.nameSuffix }}'
+      location: ${{ parameters.location }}
+      templateFile: '$(Pipeline.Workspace)/infrastructure/solution-infrastructure.bicep'
+      acrUrl: $[ stageDependencies.Provision_Azure_Container_Registry.Deploy_Azure_Container_Registry.outputs['t2.acrUrl'] ]
+      acrName: $[ stageDependencies.Provision_Azure_Container_Registry.Deploy_Azure_Container_Registry.outputs['t2.acrName'] ]
+      acrResourceGroupName: $[ stageDependencies.Provision_Azure_Container_Registry.Deploy_Azure_Container_Registry.outputs['t2.acrResourceGroupName'] ]
+  jobs:
+  - deployment: Deploy_Infrastructure_${{ parameters.name }}
+    displayName: Deploy ${{ parameters.name }} infrastructure in Azure
+    pool:
+      name: Default
+      demands:
+        - AZURE_CLI -equals True
+    environment: ${{ parameters.name }}
+    strategy: 
+      runOnce:
+        deploy:
+          steps:
+          - checkout: self
+            clean: true
+          - task: DownloadPipelineArtifact@2
+            displayName: 'Download whole infrastructure deployment file'
+            inputs:
+              artifact: 'infrastructure'
+              path: $(Pipeline.Workspace)/infrastructure
+          
+          # Version with GitVersion
+          - task: gitversion/setup@3.0.3
+            displayName: Install GitVersion
+            inputs:
+              versionSpec: '6.x'
+
+          - task: gitversion/execute@3.0.3
+            displayName: Execute GitVersion
+
+          - task: AzureCLI@2
+            displayName: 'Deploy the whole infrastructure to Azure'
+            name: t1
+            inputs:
+              azureSubscription: ${{ parameters.azureServiceConnection }}
+              addSpnToEnvironment: true
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                az --version
+                az group create --name $(resourceGroupName) --location $(location)
+                DEPLOYMENT_OUTPUT=$(az deployment group create --resource-group $(resourceGroupName) \
+                  --template-file $(templateFile) --parameters nameSuffix='$(nameSuffix)' \
+                  appNamePrefix='$(appNamePrefix)' semVer='$(GitVersion.SemVer)' sqlAdministratorPassword='Passw@rd1+' \
+                  acrName='$(acrName)' acrUrl='$(acrUrl)' acrResourceGroupName='$(acrResourceGroupName)' \
+                  executorSecurityPrincipal=${servicePrincipalId} --query properties.outputs)
+                WEBUI_CA_URL=$(jq --raw-output '.webUiCaUrl.value' <<< $DEPLOYMENT_OUTPUT)
+                if [[ -z $WEBUI_CA_URL ]]; then
+                  echo "Error: WEBUI_CA_URL is empty"
+                  exit 1
+                fi
+                echo "##vso[task.setvariable variable=webUiCaUrl;isOutput=true]$WEBUI_CA_URL"
+                echo "WEBUI_CA_URL value is: $WEBUI_CA_URL"

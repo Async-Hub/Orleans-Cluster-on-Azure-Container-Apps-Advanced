@@ -1,4 +1,5 @@
-FROM mcr.microsoft.com/playwright/python:v1.49.0-jammy
+# The image is based on Ubuntu 24.04
+FROM mcr.microsoft.com/playwright/python:v1.50.0-noble
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
@@ -9,14 +10,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommend
     software-properties-common
 
 # Install the .NET SDK 9.0
-RUN apt-get install wget
-RUN wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
-RUN dpkg -i packages-microsoft-prod.deb
-RUN rm packages-microsoft-prod.deb
+RUN add-apt-repository ppa:dotnet/backports
 RUN apt-get update && apt-get install -y dotnet-sdk-9.0
-
-# Install Playwright
-RUN dotnet tool install --global Microsoft.Playwright.CLI --version 1.2.3
 
 # Can be 'linux-x64', 'linux-arm64', 'linux-arm', 'rhel.6-x64'.
 ENV TARGETARCH=linux-x64
@@ -27,5 +22,9 @@ WORKDIR /azp
 # Run a self-hosted Azure Pipelines agent in Docker
 COPY ./start.sh .
 RUN chmod +x start.sh
+
+# Create agent user and set up home directory
+RUN useradd -m -d /home/agent agent
+RUN chown -R agent:agent /azp /home/agent
 
 ENTRYPOINT [ "./start.sh" ]

@@ -42,8 +42,8 @@ type Starter(messageSink: IMessageSink) =
     inherit XunitTestFramework(messageSink)
 
 [<CollectionDefinition(CurrentAssembly.ClusterFixture)>]
-type ClusterCollection = 
-    inherit ICollectionFixture<ClusterFixture>
+type ClusterCollection() = 
+    interface ICollectionFixture<ClusterFixture> with
 
 [<assembly: Xunit.TestFramework(CurrentAssembly.TypeName, CurrentAssembly.Name)>]
 ()
